@@ -6,9 +6,6 @@ class Probit extends EventEmitter {
 
     constructor(key, secret, demo = false) {
         super();
-
-        this.key    = key;
-        this.secret = secret;
         
         this.socket = new ProbitSocket(key, secret, demo);
 
@@ -21,8 +18,8 @@ class Probit extends EventEmitter {
         this.socket.on('trade', (trade) => {
             this.emit('trade', trade);
         });
-        this.socket.on('openorder', (openorder) => {
-            this.emit('openorder', openorder);
+        this.socket.on('order', (order) => {
+            this.emit('order', order);
         });
         this.socket.on('orderbook', (orderbook) => {
             this.emit('orderbook', orderbook);
@@ -41,9 +38,6 @@ class Probit extends EventEmitter {
         });
         this.socket.on('orderbookL4', (orderbook) => {
             this.emit('orderbookL4', orderbook);
-        });
-        this.socket.on('orderhistory', (orderhistory) => {
-            this.emit('orderhistory', orderhistory);
         });
         this.socket.on('tradehistory', (tradehistory) => {
             this.emit('tradehistory', tradehistory);

@@ -23,7 +23,7 @@ class ProbitSocket extends EventEmitter {
             switch(message.channel) {
 
                 case "balance": {
-                    message.data.length && this.emit('balance', message.data);
+                    message.data != "{}" && this.emit('balance', message.data);
                     break;
                 }
             
@@ -125,17 +125,66 @@ class ProbitSocket extends EventEmitter {
                 }
 
                 case "open_order": {
-                    message.data.length && this.emit('openorder', message.data);
+                    message.data.forEach((order) => {
+                        this.emit('order', {
+                            id                : Number(order.id),
+                            userId            : order.user_id,
+                            type              : order.type,
+                            side              : order.side,
+                            quantity          : Number(order.quantity),
+                            price             : Number(order.limit_price),
+                            timeInForce       : order.time_in_force,
+                            filledCost        : Number(order.filled_cost),
+                            filledQuantity    : Number(order.filled_quantity),
+                            openQuantity      : Number(order.open_quantity),
+                            cancelledQuantity : Number(order.cancelled_quantity),
+                            status            : order.status,
+                            timestamp         : order.time,
+                            clientOrderId     : order.client_order_id
+                        });
+                    });
                     break;
                 }
 
                 case "order_history": {
-                    message.data.length && this.emit('orderhistory', message.data);
+                    message.data.forEach((order) => {
+                        this.emit('order', {
+                            //clickity clickity clack, my mouse goes up the back. the clock strikes one, my shirt cones undone. and all the boys give me pretty horse gifts wait what.
+                            id                : Number(order.id),
+                            userId            : order.user_id,
+                            type              : order.type,
+                            side              : order.side,
+                            quantity          : Number(order.quantity),
+                            price             : Number(order.limit_price),
+                            timeInForce       : order.time_in_force,
+                            filledCost        : Number(order.filled_cost),
+                            filledQuantity    : Number(order.filled_quantity),
+                            openQuantity      : Number(order.open_quantity),
+                            cancelledQuantity : Number(order.cancelled_quantity),
+                            status            : order.status,
+                            timestamp         : order.time,
+                            clientOrderId     : order.client_order_id
+                        });
+                    });
                     break;
                 }
 
                 case "trade_history": {
-                    message.data.length && this.emit('tradehistory', message.data);
+                    message.data.forEach((trade) => {
+                        this.emit('tradehistory', {
+                            id            : trade.id,
+                            orderId       : Number(trade.order_id),
+                            side          : 'buy',
+                            feeAmount     : Number(trade.fee_amount),
+                            feeCurrencyId : 'PROB',
+                            status        : 'settled',
+                            price         : Number(trade.price),
+                            quantity      : Number(trade.quantity),
+                            cost          : Number(trade.cost),
+                            time          : '2020-02-11T03:36:37.462Z',
+                            market_id     : 'PROB-BTC'
+                        })
+                    });
                     break;
                 }
 
@@ -170,7 +219,7 @@ class ProbitSocket extends EventEmitter {
                 this.server.send(JSON.stringify({"type":"subscribe","channel":"trade_history"}));
             })
             .catch((error) => {
-                console.log("Probit.getToken() : " + error.message);
+                console.log("Probit._autenticate() : " + error.message);
             });
        
     }
