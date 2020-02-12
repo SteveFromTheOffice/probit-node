@@ -1,5 +1,5 @@
 const EventEmitter = require('./EventEmitter.js');
-const fetch        = require('node-fetch');
+const fetch = require('node-fetch');
 
 class ProbitRest extends EventEmitter {
     constructor(key, secret) {
@@ -21,154 +21,156 @@ class ProbitRest extends EventEmitter {
     }
 
     async ticker(tickers) {
-        return await this._request('/ticker?market_ids='+tickers.join(','));
+        return await this._request('/ticker?market_ids=' + tickers.join(','));
     }
 
     async orderBook(marketId) {
-        return await this._request('/order_book?market_id='+marketId);
+        return await this._request('/order_book?market_id=' + marketId);
     }
 
     async trade(marketId, startTime, endTime, limit) {
-        const res = await fetch(`${this.exchangeUrl}/trade?market_id=${marketId}&start_time=${startTime}&end_time=${endTime}&limit=${limit}`);
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await fetch(`${this.exchangeUrl}/trade?market_id=${marketId}&start_time=${startTime}&end_time=${endTime}&limit=${limit}`)
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
     }
 
     async newLimitOrder(marketId, side, timeInForce, limitPrice, quantity) {
-        
-        const res = await fetch(`${this.exchangeUrl}/new_order`, {
+        return await fetch(`${this.exchangeUrl}/new_order`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
                 'authorization': 'Bearer ' + this.token
             },
             body: JSON.stringify({
-                "market_id": marketId,
-                "type": "limit",
-                "side": side,
-                "time_in_force": timeInForce,
-                "limit_price": limitPrice,
-                "quantity": quantity
-            })
+                    "market_id": marketId,
+                    "type": "limit",
+                    "side": side,
+                    "time_in_force": timeInForce,
+                    "limit_price": limitPrice,
+                    "quantity": quantity
+                })
+                .then(res => { res.json(); })
+                .then((json) => { return json; })
+                .catch((error) => {
+                    throw new Error(error);
+                })
         });
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
     }
 
     async newMarketOrder(marketId, quantity, side, timeInForce) {
-
-        const res = await fetch(`${this.exchangeUrl}/new_order`, {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'authorization': 'Bearer ' + this.token
-            },
-            body: JSON.stringify({
-                "market_id": marketId,
-                "quantity": quantity,
-                "side": side,
-                "time_in_force": timeInForce,
-                "type": "market"
+        return await fetch(`${this.exchangeUrl}/new_order`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    'authorization': 'Bearer ' + this.token
+                },
+                body: JSON.stringify({
+                    "market_id": marketId,
+                    "quantity": quantity,
+                    "side": side,
+                    "time_in_force": timeInForce,
+                    "type": "market"
+                })
             })
-        });
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
     }
 
     async cancelOrder(marketId, orderId) {
-        const res = await fetch(`${this.exchangeUrl}/cancel_order`, {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'authorization': 'Bearer ' + this.token
-            },
-            body: JSON.stringify({
-                "market_id": marketId,
-                "order_id": orderId
+        return await fetch(`${this.exchangeUrl}/cancel_order`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    'authorization': 'Bearer ' + this.token
+                },
+                body: JSON.stringify({
+                    "market_id": marketId,
+                    "order_id": orderId
 
+                })
             })
-        });
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
     }
 
     async orderHistory(startTime, endTime, limit, marketId) {
-        
-        const res = await fetch(`${this.exchangeUrl}/order_history?start_time=${startTime}&end_time=${endTime}&limit=${limit}&market_id=${marketId}`, {
-            method: 'GET',
-            headers: {
-                'authorization': 'Bearer ' + this.token
-            },
-        });
-        if (!res.ok) {
-            console.log(res.body)
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await fetch(`${this.exchangeUrl}/order_history?start_time=${startTime}&end_time=${endTime}&limit=${limit}&market_id=${marketId}`, {
+                method: 'GET',
+                headers: {
+                    'authorization': 'Bearer ' + this.token
+                },
+            })
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
     }
 
     async tradeHistory(startTime, endTime, limit, marketId) {
-        
-        const res = await fetch(`${this.exchangeUrl}/trade_history?market_id=${marketId}&start_time=${startTime}&end_time=${endTime}&limit=${limit}`, {
-            method: 'GET',
-            headers: {
-                'authorization': 'Bearer ' + this.token
-            },
-        });
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await fetch(`${this.exchangeUrl}/trade_history?market_id=${marketId}&start_time=${startTime}&end_time=${endTime}&limit=${limit}`, {
+                method: 'GET',
+                headers: {
+                    'authorization': 'Bearer ' + this.token
+                },
+            })
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
     }
 
     async balance() {
-        
-        const res = await fetch(`${this.exchangeUrl}/balance`, {
-            method: 'GET',
-            headers: {
-                'authorization': 'Bearer ' + this.token
-            },
-        });
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await fetch(`${this.exchangeUrl}/balance`, {
+                method: 'GET',
+                headers: {
+                    'authorization': 'Bearer ' + this.token
+                },
+            })
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
     }
 
     async order(marketId, orderId) {
-        
-        const res = await fetch(`${this.exchangeUrl}/order?market_id=${marketId}&order_id=${orderId}`, {
-            method: 'GET',
-            headers: {
-                'authorization': 'Bearer ' + this.token
-            },
-        });
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await fetch(`${this.exchangeUrl}/order?market_id=${marketId}&order_id=${orderId}`, {
+                method: 'GET',
+                headers: {
+                    'authorization': 'Bearer ' + this.token
+                },
+            })
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
     }
 
     async openOrder(marketId) {
-        
-        const res = await fetch(`${this.exchangeUrl}/open_order?market_id=${marketId}`, {
-            method: 'GET',
-            headers: {
-                'authorization': 'Bearer ' + this.token
-            },
-        });
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await fetch(`${this.exchangeUrl}/open_order?market_id=${marketId}`, {
+                method: 'GET',
+                headers: {
+                    'authorization': 'Bearer ' + this.token
+                },
+            })
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
+
     }
 
     async _request(path) {
@@ -184,21 +186,21 @@ class ProbitRest extends EventEmitter {
 
     }
 
-   async  _requestAuthorized() {
+    async _requestAuthorized() {
 
     }
 
     _updateToken(key, secret) {
         let auth = new Buffer(`${key}:${secret}`).toString('base64');
         let body = JSON.stringify({ grant_type: 'client_credentials' });
-        let url  = 'https://accounts.probit.com/token';
+        let url = 'https://accounts.probit.com/token';
 
         fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Basic ' + auth }, body: body })
             .then(res => res.json())
             .then((json) => {
 
                 // Set access token.
-                if(!this.token) {
+                if (!this.token) {
                     this.token = json.access_token;
                     this.emit('ready');
                 }
@@ -208,7 +210,7 @@ class ProbitRest extends EventEmitter {
                 // Queue next refresh.
                 setTimeout(() => {
                     this._updateToken(key, secret);
-                }, json.expires_in*1000 - 5000);
+                }, json.expires_in * 1000 - 5000);
 
             })
             .catch((error) => {
