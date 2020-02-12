@@ -96,11 +96,7 @@ class ProbitRest {
         if (!res.ok) {
             throw new Error(res.statusText);
         }
-        try {
-            return res.json();
-        } catch (err) {
-            console.log(err);
-        }
+        return res.json();
     }
 
     async newMarketOrder(marketId, quantity, side, timeInForce) {
@@ -122,13 +118,27 @@ class ProbitRest {
         if (!res.ok) {
             throw new Error(res.statusText);
         }
-        try {
-            return res.json();
-        } catch (err) {
-            console.log(err);
-        }
+        return res.json();
     }
 
+    async cancelOrder(marketId, orderId) {
+        const tokenResponse = await this.token();
+        const res = await fetch(`${this.exchangeUrl}/cancel_order`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+                'authorization': 'Bearer ' + tokenResponse.access_token
+            },
+            body: JSON.stringify({
+                "market_id": marketId,
+                "order_id": orderId
 
+            })
+        });
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+        return res.json();
+    }
 }
 module.exports = ProbitRest;
