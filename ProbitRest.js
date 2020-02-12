@@ -4,50 +4,28 @@ const fetch        = require('node-fetch');
 class ProbitRest extends EventEmitter {
     constructor(key, secret) {
         super();
-        
-        this.exchangeUrl = 'https://api.probit.com/api/exchange/v1';
 
         this._updateToken(key, secret);
     }
 
     async market() {
-        const res = await fetch(`${this.exchangeUrl}/market`);
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await this._request('/market');
     }
 
     async currency() {
-        const res = await fetch(`${this.exchangeUrl}/currency`);
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await this._request('/currency');
     }
 
     async time() {
-        const res = await fetch(`${this.exchangeUrl}/time`);
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await this._request('/time');
     }
 
     async ticker(tickers) {
-        const res = await fetch(`${this.exchangeUrl}/ticker?market_ids=${tickers.join(',')}`);
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await this._request('/ticker?market_ids='+tickers.join(','));
     }
 
     async orderBook(marketId) {
-        const res = await fetch(`${this.exchangeUrl}/order_book?market_id=${marketId}`);
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        return res.json();
+        return await this._request('/order_book?market_id='+marketId);
     }
 
     async trade(marketId, startTime, endTime, limit) {
@@ -193,6 +171,23 @@ class ProbitRest extends EventEmitter {
         return res.json();
     }
 
+    async _request(path) {
+
+        let url = 'https://api.probit.com/api/exchange/v1' + path;
+
+        return fetch(url)
+            .then(res => { res.json(); })
+            .then((json) => { return json; })
+            .catch((error) => {
+                throw new Error(error);
+            });
+
+    }
+
+   async  _requestAuthorized() {
+
+    }
+
     _updateToken(key, secret) {
         let auth = new Buffer(`${key}:${secret}`).toString('base64');
         let body = JSON.stringify({ grant_type: 'client_credentials' });
@@ -219,8 +214,9 @@ class ProbitRest extends EventEmitter {
             .catch((error) => {
                 throw new Error(error);
             });
-            
+
     }
 
 }
+
 module.exports = ProbitRest;
