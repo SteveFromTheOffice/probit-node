@@ -140,5 +140,80 @@ class ProbitRest {
         }
         return res.json();
     }
+
+    async orderHistory(startTime, endTime, limit, marketId) {
+        const tokenResponse = await this.token();
+        const res = await fetch(`${this.exchangeUrl}order_history?market_id=${marketId}&start_time=${startTime.toISOString()}&end_time=${endTime}&limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json',
+                'authorization': 'Bearer ' + tokenResponse.access_token
+            },
+        });
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+        return res.json();
+    }
+
+    async tradeHistory(startTime, endTime, limit, marketId) {
+        const tokenResponse = await this.token();
+        const res = await fetch(`${this.exchangeUrl}trade_history?market_id=${marketId}&start_time=${startTime.toISOString()}&end_time=${endTime}&limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json',
+                'authorization': 'Bearer ' + tokenResponse.access_token
+            },
+        });
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+        return res.json();
+    }
+
+    async balance() {
+        const tokenResponse = await this.token();
+        const res = await fetch(`${this.exchangeUrl}/balance`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json',
+                'authorization': 'Bearer ' + tokenResponse.access_token
+            },
+        });
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+        return res.json();
+    }
+
+    async order(marketId, orderId) {
+        const tokenResponse = await this.token();
+        const res = await fetch(`${this.exchangeUrl}/order?market_id=${marketId}&order_id=${orderId}`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json',
+                'authorization': 'Bearer ' + tokenResponse.access_token
+            },
+        });
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+        return res.json();
+    }
+
+    async openOrder(marketId) {
+        const tokenResponse = await this.token();
+        const res = await fetch(`${this.exchangeUrl}/open_order?market_id=${marketId}`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json',
+                'authorization': 'Bearer ' + tokenResponse.access_token
+            },
+        });
+        if (!res.ok) {
+            throw new Error(res.statusText);
+        }
+        return res.json();
+    }
 }
 module.exports = ProbitRest;
