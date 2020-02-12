@@ -1,0 +1,23 @@
+{
+  "name": "probit-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Probit.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SteveFromTheOffice/probit-node.git"
+  },
+  "author": "SteveFromTheOffice",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SteveFromTheOffice/probit-node/issues"
+  },
+  "homepage": "https://github.com/SteveFromTheOffice/probit-node#readme",
+  "dependencies": {
+    "superagent": "^5.2.1",
+    "ws": "^7.2.1"
+  }
+}
