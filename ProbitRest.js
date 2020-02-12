@@ -53,7 +53,7 @@ class ProbitRest {
     }
 
     async ticker(tickers) {
-        const res = await fetch(`${this.exchangeUrl}/time?market_ids=${tickers.join(',')}`);
+        const res = await fetch(`${this.exchangeUrl}/ticker?market_ids=${tickers.join(',')}`);
         if (!res.ok) {
             throw new Error(res.statusText);
         }
@@ -61,7 +61,7 @@ class ProbitRest {
     }
 
     async orderBook(marketId) {
-        const res = await fetch(`${this.exchangeUrl}/ticker?market_id=${marketId}`);
+        const res = await fetch(`${this.exchangeUrl}/order_book?market_id=${marketId}`);
         if (!res.ok) {
             throw new Error(res.statusText);
         }
@@ -69,14 +69,14 @@ class ProbitRest {
     }
 
     async trade(marketId, startTime, endTime, limit) {
-        const res = await fetch(`${this.exchangeUrl}/trade?market_id=${marketId}&start_time=${startTime.toISOString()}&end_time=${endTime}&limit=${limit}`);
+        const res = await fetch(`${this.exchangeUrl}/trade?market_id=${marketId}&start_time=${startTime}&end_time=${endTime}&limit=${limit}`);
         if (!res.ok) {
             throw new Error(res.statusText);
         }
         return res.json();
     }
 
-    async newLimitOrder(markerId, side, timeInForce, limitPrice, quantity) {
+    async newLimitOrder(marketId, side, timeInForce, limitPrice, quantity) {
         const tokenResponse = await this.token();
         const res = await fetch(`${this.exchangeUrl}/new_order`, {
             method: 'POST',
@@ -85,7 +85,7 @@ class ProbitRest {
                 'authorization': 'Bearer ' + tokenResponse.access_token
             },
             body: JSON.stringify({
-                "market_id": markerId,
+                "market_id": marketId,
                 "type": "limit",
                 "side": side,
                 "time_in_force": timeInForce,
@@ -143,14 +143,14 @@ class ProbitRest {
 
     async orderHistory(startTime, endTime, limit, marketId) {
         const tokenResponse = await this.token();
-        const res = await fetch(`${this.exchangeUrl}order_history?market_id=${marketId}&start_time=${startTime.toISOString()}&end_time=${endTime}&limit=${limit}`, {
+        const res = await fetch(`${this.exchangeUrl}/order_history?start_time=${startTime}&end_time=${endTime}&limit=${limit}&market_id=${marketId}`, {
             method: 'GET',
             headers: {
-                'content-type': 'application/json',
                 'authorization': 'Bearer ' + tokenResponse.access_token
             },
         });
         if (!res.ok) {
+            console.log(res.body)
             throw new Error(res.statusText);
         }
         return res.json();
@@ -158,10 +158,9 @@ class ProbitRest {
 
     async tradeHistory(startTime, endTime, limit, marketId) {
         const tokenResponse = await this.token();
-        const res = await fetch(`${this.exchangeUrl}trade_history?market_id=${marketId}&start_time=${startTime.toISOString()}&end_time=${endTime}&limit=${limit}`, {
+        const res = await fetch(`${this.exchangeUrl}/trade_history?market_id=${marketId}&start_time=${startTime}&end_time=${endTime}&limit=${limit}`, {
             method: 'GET',
             headers: {
-                'content-type': 'application/json',
                 'authorization': 'Bearer ' + tokenResponse.access_token
             },
         });
@@ -176,7 +175,6 @@ class ProbitRest {
         const res = await fetch(`${this.exchangeUrl}/balance`, {
             method: 'GET',
             headers: {
-                'content-type': 'application/json',
                 'authorization': 'Bearer ' + tokenResponse.access_token
             },
         });
@@ -191,7 +189,6 @@ class ProbitRest {
         const res = await fetch(`${this.exchangeUrl}/order?market_id=${marketId}&order_id=${orderId}`, {
             method: 'GET',
             headers: {
-                'content-type': 'application/json',
                 'authorization': 'Bearer ' + tokenResponse.access_token
             },
         });
@@ -206,7 +203,6 @@ class ProbitRest {
         const res = await fetch(`${this.exchangeUrl}/open_order?market_id=${marketId}`, {
             method: 'GET',
             headers: {
-                'content-type': 'application/json',
                 'authorization': 'Bearer ' + tokenResponse.access_token
             },
         });
