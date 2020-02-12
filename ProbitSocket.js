@@ -1,4 +1,3 @@
-const Crypto       = require('crypto');
 const EventEmitter = require('./EventEmitter.js');
 const SuperAgent   = require("superagent");
 const WebSocket    = require('ws');
@@ -34,12 +33,12 @@ class ProbitSocket extends EventEmitter {
                     message.ticker && this.emit('ticker', {
                         symbol      : message.market_id,
                         lag         : message.lag,
-                        last        : message.ticker.last,
-                        low         : message.ticker.low,
-                        high        : message.ticker.high,
-                        change      : message.ticker.change,
-                        baseVolume  : message.ticker.base_volume,
-                        quoteVolume : message.ticker.quote_volume,
+                        last        : Number(message.ticker.last),
+                        low         : Number(message.ticker.low),
+                        high        : Number(message.ticker.high),
+                        change      : Number(message.ticker.change),
+                        baseVolume  : Number(message.ticker.base_volume),
+                        quoteVolume : Number(message.ticker.quote_volume),
                         timestamp   : message.ticker.time
                     });
 
@@ -49,7 +48,7 @@ class ProbitSocket extends EventEmitter {
                             symbol        : message.market_id,
                             lag           : message.lag,
                             id            : trade.id,
-                            quantity      : trade.quantity,
+                            quantity      : Number(trade.quantity),
                             side          : trade.side,
                             tickDirection : trade.tick_direction,
                             timestamp     : trade.time
@@ -58,32 +57,68 @@ class ProbitSocket extends EventEmitter {
 
                     // Order Books.
                     message.order_books && message.order_books.forEach((order) => {
-                        this.emit('orderbook', order);
+                        this.emit('orderbook', {
+                            symbol   : message.market_id,
+                            lag      : Number(message.lag),
+                            side     : order.side,
+                            price    : Number(order.price),
+                            quantity : Number(order.quantity)
+                        });
                     });
 
                     // Order Books L0.
                     message.order_books && message.order_books_l0.forEach((order) => {
-                        this.emit('orderbookL0', order);
+                        this.emit('orderbookL0', {
+                            symbol   : message.market_id,
+                            lag      : Number(message.lag),
+                            side     : order.side,
+                            price    : Number(order.price),
+                            quantity : Number(order.quantity)
+                        });
                     });
 
                     // Order Books L1.
                     message.order_books && message.order_books_l1.forEach((order) => {
-                        this.emit('orderbookL1', order);
+                        this.emit('orderbookL1', {
+                            symbol   : message.market_id,
+                            lag      : Number(message.lag),
+                            side     : order.side,
+                            price    : Number(order.price),
+                            quantity : Number(order.quantity)
+                        });
                     });
 
                     // Order Books L2.
                     message.order_books && message.order_books_l2.forEach((order) => {
-                        this.emit('orderbookL2', order);
+                        this.emit('orderbookL2', {
+                            symbol   : message.market_id,
+                            lag      : Number(message.lag),
+                            side     : order.side,
+                            price    : Number(order.price),
+                            quantity : Number(order.quantity)
+                        });
                     });
 
                     // Order Books L3.
                     message.order_books && message.order_books_l3.forEach((order) => {
-                        this.emit('orderbookL3', order);
+                        this.emit('orderbookL3', {
+                            symbol   : message.market_id,
+                            lag      : Number(message.lag),
+                            side     : order.side,
+                            price    : Number(order.price),
+                            quantity : Number(order.quantity)
+                        });
                     });
 
                     // Order Books L4.
                     message.order_books && message.order_books_l4.forEach((order) => {
-                        this.emit('orderbookL4', order);
+                        this.emit('orderbookL4', {
+                            symbol   : message.market_id,
+                            lag      : Number(message.lag),
+                            side     : order.side,
+                            price    : Number(order.price),
+                            quantity : Number(order.quantity)
+                        });
                     });
 
                     break;
@@ -114,7 +149,7 @@ class ProbitSocket extends EventEmitter {
         });
     }
 
-    Subscribe(symbol, filter = []) {
+    subscribe(symbol, filter = []) {
         this.server.send(JSON.stringify({"type":"subscribe","channel":"marketdata","market_id":symbol,"interval":100,"filter":filter}));
     }
 
