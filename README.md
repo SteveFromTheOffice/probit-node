@@ -9,6 +9,18 @@ let probit = new Probit("ID", "SECRET", false);
     probit.on('ready', () => {
     })
     probit.on('balance', (balance) => {
+        /*
+        {   
+            BTC: {  
+                available: '0.1503423100003594', 
+                total: '0.1513443100003594' 
+            },
+            CORN: { 
+                available: '13371337', 
+                total: '13371337' 
+            },
+        }
+        */
     })
     probit.on('ticker', (ticker) => {
          /*
@@ -36,7 +48,24 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('openorder', (order) => {
+    probit.on('order', (order) => {
+        /*
+        {   id: 344833732,
+            userId: 'c8a24c28-94c5-40ff-9f70-4750fge721d8',
+            type: 'limit',
+            side: 'buy',
+            quantity: 1000,
+            price: 0.000001,
+            timeInForce: 'gtc',
+            filledCost: 0,
+            filledQuantity: 0,
+            openQuantity: 1000,
+            cancelledQuantity: 0,
+            status: 'open',
+            timestamp: '2020-02-11T04:04:54.103Z',
+            clientOrderId: ''
+        }
+        */
     })
     probit.on('orderbook', (order) => {
         /* 
@@ -98,8 +127,20 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('orderhistory', (history) => {
-    })
     probit.on('tradehistory', (history) => {
+        /*
+        {   id: 'PROB-BTC:98965',
+            orderId: 344813807,
+            side: 'buy',
+            feeAmount: 1.3612558524528322,
+            feeCurrencyId: 'PROB',
+            status: 'settled',
+            price: 0.00001089,
+            quantity: 759.11258769,
+            cost: 0.0082667360799441,
+            time: '2020-02-11T03:36:37.462Z',
+            market_id: 'PROB-BTC'
+        }
+        */
     })
 ```
