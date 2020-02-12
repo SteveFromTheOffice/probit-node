@@ -248,3 +248,10 @@ node_modules/util-deprecate/node.js
 node_modules/util-deprecate/package.json
 node_modules/util-deprecate/README.md
 index.js
+node_modules/node-fetch/browser.js
+node_modules/node-fetch/CHANGELOG.md
+node_modules/node-fetch/LICENSE.md
+node_modules/node-fetch/package.json
+node_modules/node-fetch/README.md
+node_modules/node-fetch/lib/index.es.js
+node_modules/node-fetch/lib/index.mjs

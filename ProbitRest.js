@@ -1,31 +1,13 @@
-const fetch = require('node-fetch');
+const EventEmitter = require('./EventEmitter.js');
+const fetch        = require('node-fetch');
 
-class ProbitRest {
+class ProbitRest extends EventEmitter {
     constructor(key, secret) {
-        this.key = key;
-        this.secret = secret;
-        this.tokenUrl = 'https://accounts.probit.com';
+        super();
+        
         this.exchangeUrl = 'https://api.probit.com/api/exchange/v1';
-    }
 
-    async token() {
-        console.log(this.key);
-        const res = await fetch(`${this.tokenUrl}/token`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Basic ' + new Buffer(`${this.key}:${this.secret}`).toString('base64')
-            },
-            body: JSON.stringify({ grant_type: 'client_credentials' })
-        });
-        if (!res.ok) {
-            throw new Error(res.statusText);
-        }
-        try {
-            return res.json();
-        } catch (err) {
-            console.log(err);
-        }
+        this._updateToken(key, secret);
     }
 
     async market() {
@@ -77,12 +59,12 @@ class ProbitRest {
     }
 
     async newLimitOrder(marketId, side, timeInForce, limitPrice, quantity) {
-        const tokenResponse = await this.token();
+        
         const res = await fetch(`${this.exchangeUrl}/new_order`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
-                'authorization': 'Bearer ' + tokenResponse.access_token
+                'authorization': 'Bearer ' + this.token
             },
             body: JSON.stringify({
                 "market_id": marketId,
@@ -100,12 +82,12 @@ class ProbitRest {
     }
 
     async newMarketOrder(marketId, quantity, side, timeInForce) {
-        const tokenResponse = await this.token();
+
         const res = await fetch(`${this.exchangeUrl}/new_order`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
-                'authorization': 'Bearer ' + tokenResponse.access_token
+                'authorization': 'Bearer ' + this.token
             },
             body: JSON.stringify({
                 "market_id": marketId,
@@ -122,12 +104,11 @@ class ProbitRest {
     }
 
     async cancelOrder(marketId, orderId) {
-        const tokenResponse = await this.token();
         const res = await fetch(`${this.exchangeUrl}/cancel_order`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
-                'authorization': 'Bearer ' + tokenResponse.access_token
+                'authorization': 'Bearer ' + this.token
             },
             body: JSON.stringify({
                 "market_id": marketId,
@@ -142,11 +123,11 @@ class ProbitRest {
     }
 
     async orderHistory(startTime, endTime, limit, marketId) {
-        const tokenResponse = await this.token();
+        
         const res = await fetch(`${this.exchangeUrl}/order_history?start_time=${startTime}&end_time=${endTime}&limit=${limit}&market_id=${marketId}`, {
             method: 'GET',
             headers: {
-                'authorization': 'Bearer ' + tokenResponse.access_token
+                'authorization': 'Bearer ' + this.token
             },
         });
         if (!res.ok) {
@@ -157,11 +138,11 @@ class ProbitRest {
     }
 
     async tradeHistory(startTime, endTime, limit, marketId) {
-        const tokenResponse = await this.token();
+        
         const res = await fetch(`${this.exchangeUrl}/trade_history?market_id=${marketId}&start_time=${startTime}&end_time=${endTime}&limit=${limit}`, {
             method: 'GET',
             headers: {
-                'authorization': 'Bearer ' + tokenResponse.access_token
+                'authorization': 'Bearer ' + this.token
             },
         });
         if (!res.ok) {
@@ -171,11 +152,11 @@ class ProbitRest {
     }
 
     async balance() {
-        const tokenResponse = await this.token();
+        
         const res = await fetch(`${this.exchangeUrl}/balance`, {
             method: 'GET',
             headers: {
-                'authorization': 'Bearer ' + tokenResponse.access_token
+                'authorization': 'Bearer ' + this.token
             },
         });
         if (!res.ok) {
@@ -185,11 +166,11 @@ class ProbitRest {
     }
 
     async order(marketId, orderId) {
-        const tokenResponse = await this.token();
+        
         const res = await fetch(`${this.exchangeUrl}/order?market_id=${marketId}&order_id=${orderId}`, {
             method: 'GET',
             headers: {
-                'authorization': 'Bearer ' + tokenResponse.access_token
+                'authorization': 'Bearer ' + this.token
             },
         });
         if (!res.ok) {
@@ -199,11 +180,11 @@ class ProbitRest {
     }
 
     async openOrder(marketId) {
-        const tokenResponse = await this.token();
+        
         const res = await fetch(`${this.exchangeUrl}/open_order?market_id=${marketId}`, {
             method: 'GET',
             headers: {
-                'authorization': 'Bearer ' + tokenResponse.access_token
+                'authorization': 'Bearer ' + this.token
             },
         });
         if (!res.ok) {
@@ -211,5 +192,35 @@ class ProbitRest {
         }
         return res.json();
     }
+
+    _updateToken(key, secret) {
+        let auth = new Buffer(`${key}:${secret}`).toString('base64');
+        let body = JSON.stringify({ grant_type: 'client_credentials' });
+        let url  = 'https://accounts.probit.com/token';
+
+        fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Basic ' + auth }, body: body })
+            .then(res => res.json())
+            .then((json) => {
+
+                // Set access token.
+                if(!this.token) {
+                    this.token = json.access_token;
+                    this.emit('ready');
+                }
+
+                this.token = json.access_token;
+
+                // Queue next refresh.
+                setTimeout(() => {
+                    this._updateToken(key, secret);
+                }, json.expires_in*1000 - 5000);
+
+            })
+            .catch((error) => {
+                throw new Error(error);
+            });
+            
+    }
+
 }
 module.exports = ProbitRest;
