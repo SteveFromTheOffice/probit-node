@@ -115,7 +115,7 @@ class ProbitSocket extends EventEmitter {
     }
 
     Subscribe(symbol, filter = []) {
-        this.server.send(JSON.stringify({"type":"subscribe","channel":"marketdata",symbol:"ETH-BTC","interval":100,"filter":filter}));
+        this.server.send(JSON.stringify({"type":"subscribe","channel":"marketdata","market_id":symbol,"interval":100,"filter":filter}));
     }
 
     _authenticate(key, secret) {
