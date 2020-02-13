@@ -6,9 +6,11 @@ Work in progress. <3
 const Probit = require('./Probit.js');
 
 let probit = new Probit("ID", "SECRET", false);
-    probit.on('ready', () => {
+    probit.socket.on('ready', () => {
+        // Connected and authenticated, start doing stuff. 
+        probit.socket.subscribe("BTC-USDT");
     })
-    probit.on('balance', (balance) => {
+    probit.socket.on('balance', (balance) => {
         /*
         {   
             BTC: {  
@@ -22,7 +24,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('ticker', (ticker) => {
+    probit.socket.on('ticker', (ticker) => {
          /*
         {   symbol: 'BTC-USDT',
             lag: 0,
@@ -36,7 +38,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('trade', (trade) => {
+    probit.socket.on('trade', (trade) => {
         /*
         {   symbol: 'BTC-USDT',
             lag: 0,
@@ -48,7 +50,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('order', (order) => {
+    probit.socket.on('order', (order) => {
         /*
         {   id: 344833732,
             userId: 'c8a24c28-94c5-40ff-9f70-4750fge721d8',
@@ -67,7 +69,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('orderbook', (order) => {
+    probit.socket.on('orderbook', (order) => {
         /* 
         {   symbol: 'BTC-USDT',
             lag: 0,
@@ -77,7 +79,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('orderbookL0', (order) => {
+    probit.socket.on('orderbookL0', (order) => {
         /*
         {   symbol: 'BTC-USDT',
             lag: 0,
@@ -87,7 +89,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('orderbookL1', (order) => {
+    probit.socket.on('orderbookL1', (order) => {
         /*
         {   symbol: 'BTC-USDT',
             lag: 0,
@@ -97,7 +99,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('orderbookL2', (order) => {
+    probit.socket.on('orderbookL2', (order) => {
         /*
         {   symbol: 'BTC-USDT',
             lag: 0,
@@ -107,7 +109,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('orderbookL3', (order) => {
+    probit.socket.on('orderbookL3', (order) => {
         /*
         {   symbol: 'BTC-USDT',
             lag: 0,
@@ -117,7 +119,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('orderbookL4', (order) => {
+    probit.socket.on('orderbookL4', (order) => {
         /*
         {   symbol: 'BTC-USDT',
             lag: 0,
@@ -127,7 +129,7 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
-    probit.on('tradehistory', (history) => {
+    probit.socket.on('tradehistory', (history) => {
         /*
         {   id: 'PROB-BTC:98965',
             orderId: 344813807,
@@ -143,4 +145,8 @@ let probit = new Probit("ID", "SECRET", false);
         }
         */
     })
+
+    probit.rest.on('ready', () => {
+        // Authenticated and ready to do stuff.
+    });
 ```
