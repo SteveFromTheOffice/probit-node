@@ -1,9 +1,9 @@
 # probit-node
 
-Work in progress. <3
+npm install probit-node
 
 ```javascript
-const Probit = require('./Probit.js');
+const Probit = require('probit-node');
 
 let probit = new Probit("ID", "SECRET", false);
     probit.socket.on('ready', () => {
