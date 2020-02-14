@@ -48,6 +48,7 @@ class ProbitSocket extends EventEmitter {
                             symbol        : message.market_id,
                             lag           : message.lag,
                             id            : trade.id,
+                            price         : Number(trade.price),
                             quantity      : Number(trade.quantity),
                             side          : trade.side,
                             tickDirection : trade.tick_direction,
