@@ -6,7 +6,6 @@ class ProbitRest extends EventEmitter {
         super();
 
         this.exchangeUrl = 'https://api.probit.com/api/exchange/v1';
-
         this._updateToken(key, secret);
     }
 
