@@ -205,7 +205,7 @@ class ProbitSocket extends EventEmitter {
 
     _authenticate(key, secret) {
 
-        let auth = "Basic " + new Buffer(key+":"+secret).toString('base64');
+        let auth = "Basic " + new Buffer.from(key+":"+secret).toString('base64');
         let body = JSON.stringify({ grant_type: 'client_credentials' });
 
         SuperAgent.post('https://accounts.probit.com/token')
