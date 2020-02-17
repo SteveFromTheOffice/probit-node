@@ -2,6 +2,7 @@ const EventEmitter = require('./EventEmitter.js');
 const SuperAgent   = require('superagent');
 
 class ProbitRest extends EventEmitter {
+    
     constructor(key, secret) {
         super();
 
@@ -9,12 +10,31 @@ class ProbitRest extends EventEmitter {
         this._updateToken(key, secret);
     }
 
-    async market() {
-        return await this._request('GET', '/market');
+    async balance() {
+        return await this._requestAuthenticated('GET', '/balance');
+    }
+
+    async cancelOrder(marketId, orderId) {
+        return await this._requestAuthenticated('POST', '/cancel_order', {
+            "market_id" : marketId.toString(),
+            "order_id"  : orderId.toString()
+        });
+    }
+
+    async candle(marketId, startTime, endTime, interval, limit=200) {
+        startTime = new Date(startTime).toISOString();
+        endTime   = new Date(endTime).toISOString();
+        limit     = limit.toString();
+
+        return await this._request('GET', `/candle?nocache=${Date.now()}&market_ids=${marketId}&start_time=${startTime}&end_time=${endTime}&interval=${interval}&sort=desc&limit=${limit}`);
     }
 
     async currency() {
         return await this._request('GET', '/currency');
+    }
+
+    async market() {
+        return await this._request('GET', '/market');
     }
 
     async time() {
@@ -22,11 +42,11 @@ class ProbitRest extends EventEmitter {
     }
 
     async ticker(tickers) {
-        return await this._request('GET', '/ticker?market_ids=' + tickers.join(','));
+        return await this._request('GET', `/ticker?market_ids=${tickers.join(',')}`);
     }
 
     async orderBook(marketId) {
-        return await this._request('GET', '/order_book?market_id=' + marketId);
+        return await this._request('GET', `/order_book?market_id=${marketId}`);
     }
 
     async trade(marketId, startTime, endTime, limit) {
@@ -47,17 +67,32 @@ class ProbitRest extends EventEmitter {
     async newMarketOrder(marketId, quantity, side, timeInForce) {
         return await this._requestAuthenticated("POST", "/new_order", {
             "market_id"     : marketId,
-            "quantity"      : quantity.toString(),
+            "quantity"      : Math.abs(quantity).toString(),
             "side"          : side,
             "time_in_force" : timeInForce,
             "type"          : "market"
         });
     }
 
-    async cancelOrder(marketId, orderId) {
-        return await this._requestAuthenticated('POST', '/cancel_order', {
-            "market_id" : marketId.toString(),
-            "order_id"  : orderId.toString()
+    async limitOrder(marketId, quantity, price, timeInForce='gtc', orderId="") {
+        return await this._requestAuthenticated("POST", "/new_order", {
+            "market_id"     : marketId,
+            "type"          : "limit",
+            "side"          : quantity < 0 ? "sell" : "buy",
+            "time_in_force" : timeInForce,
+            "limit_price"   : price.toString(),
+            "quantity"      : Math.abs(quantity).toString()
+        });
+    }
+
+    async marketOrder(marketId, quantity, timeInForce='ioc') {
+        //return await this.newMarketOrder(marketId, quantity, side = quantity < 0 ? "sell" : "buy", timeInForce);
+        return await this._requestAuthenticated("POST", "/new_order", {
+            "market_id"     : marketId,
+            "type"          : "market",
+            "side"          : quantity < 0 ? "sell" : "buy",
+            "time_in_force" : timeInForce,
+            "quantity"      : Math.abs(quantity).toString()
         });
     }
 
@@ -73,10 +108,6 @@ class ProbitRest extends EventEmitter {
         endTime   = new Date(endTime).toISOString();
 
         return await this._requestAuthenticated('GET', `/trade_history?market_id=${marketId}&start_time=${startTime}&end_time=${endTime}&limit=${limit}`);
-    }
-
-    async balance() {
-        return await this._requestAuthenticated('GET', '/balance');
     }
 
     async order(marketId, orderId) {
@@ -113,7 +144,7 @@ class ProbitRest extends EventEmitter {
     }
 
     _updateToken(key, secret) {
-        let auth = "Basic " + new Buffer(`${key}:${secret}`).toString('base64');
+        let auth = "Basic " + new Buffer.from(`${key}:${secret}`).toString('base64');
         let body = JSON.stringify({ grant_type: 'client_credentials' });
         let url  = 'https://accounts.probit.com/token';
 
