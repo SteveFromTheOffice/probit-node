@@ -50,9 +50,28 @@ probit.socket.on('trade', (trade) => {
     //    timestamp: '2020-02-12T03:49:02.177Z' 
     //}
 })
-probit.socket.on('order', (order) => {
+probit.socket.on('openorder', (order) => {
     //{   id: 344833732,
     //    userId: 'c8a24c28-94c5-40ff-9f70-4750fge721d8',
+	//    market_id:'BTC-USDT',	
+    //    type: 'limit',
+    //    side: 'buy',
+    //    quantity: 1000,
+    //    price: 0.000001,
+    //    timeInForce: 'gtc',
+    //    filledCost: 0,
+    //    filledQuantity: 0,
+    //    openQuantity: 1000,
+    //    cancelledQuantity: 0,
+    //    status: 'open',
+    //    timestamp: '2020-02-11T04:04:54.103Z',
+    //    clientOrderId: ''
+    //}
+})
+probit.socket.on('orderhistory', (order) => {
+    //{   id: 344833732,
+    //    userId: 'c8a24c28-94c5-40ff-9f70-4750fge721d8',
+	//    market_id:'BTC-USDT',
     //    type: 'limit',
     //    side: 'buy',
     //    quantity: 1000,
