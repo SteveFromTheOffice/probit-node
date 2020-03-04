@@ -127,9 +127,10 @@ class ProbitSocket extends EventEmitter {
 
                 case "open_order": {
                     message.data.forEach((order) => {
-                        this.emit('order', {
+                        this.emit('openorder', {
                             id                : Number(order.id),
                             userId            : order.user_id,
+                            marketId          : order.market_id, 							
                             type              : order.type,
                             side              : order.side,
                             quantity          : Number(order.quantity),
@@ -149,11 +150,12 @@ class ProbitSocket extends EventEmitter {
 
                 case "order_history": {
                     message.data.forEach((order) => {
-                        this.emit('order', {
+                        this.emit('orderhistory', {
                             //clickity clickity clack, my mouse goes up the back. the clock strikes one, my shirt cones undone. and all the boys give me pretty horse gifts wait what.
                             id                : Number(order.id),
                             userId            : order.user_id,
-                            type              : order.type,
+                            marketId          : order.market_id, 
+							type              : order.type,
                             side              : order.side,
                             quantity          : Number(order.quantity),
                             price             : Number(order.limit_price),
