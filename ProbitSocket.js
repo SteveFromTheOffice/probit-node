@@ -152,6 +152,7 @@ class ProbitSocket extends EventEmitter {
                     message.data.forEach((order) => {
                         this.emit('orderhistory', {
                             //clickity clickity clack, my mouse goes up the back. the clock strikes one, my shirt cones undone. and all the boys give me pretty horse gifts wait what.
+							//the sea of time floats by while I am blind the whole time.
                             id                : Number(order.id),
                             userId            : order.user_id,
                             marketId          : order.market_id, 
@@ -177,15 +178,15 @@ class ProbitSocket extends EventEmitter {
                         this.emit('tradehistory', {
                             id            : trade.id,
                             orderId       : Number(trade.order_id),
-                            side          : 'buy',
+                            side          : trade.side,
                             feeAmount     : Number(trade.fee_amount),
-                            feeCurrencyId : 'PROB',
-                            status        : 'settled',
+                            feeCurrencyId : trade.fee_currency_id,
+                            status        : trade.status,
                             price         : Number(trade.price),
                             quantity      : Number(trade.quantity),
                             cost          : Number(trade.cost),
-                            time          : '2020-02-11T03:36:37.462Z',
-                            market_id     : 'PROB-BTC'
+                            time          : trade.time,
+                            market_id     : trade.market_id
                         })
                     });
                     break;
