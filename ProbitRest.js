@@ -2,12 +2,23 @@ const EventEmitter = require('./EventEmitter.js');
 const SuperAgent   = require('superagent');
 
 class ProbitRest extends EventEmitter {
-    
-    constructor(key, secret) {
+
+    _timeoutId;
+
+    constructor(key = '', secret = '') {
         super();
 
         this.exchangeUrl = 'https://api.probit.com/api/exchange/v1';
-        this._updateToken(key, secret);
+
+        if (key && secret) {
+            this._updateToken(key, secret);
+        } else {
+            this.emit('ready');
+        }
+    }
+
+    close () {
+        clearTimeout(this._timeoutId);
     }
 
     async balance() {
@@ -153,7 +164,7 @@ class ProbitRest extends EventEmitter {
             .set('Authorization', auth)
             .send(body)
             .then((result) => {
-                
+
                 // Set access token.
                 if (!this.token) {
                     this.token = result.body.access_token;
@@ -163,7 +174,7 @@ class ProbitRest extends EventEmitter {
                 this.token = result.body.access_token;
 
                 // Queue next refresh.
-                setTimeout(() => {
+                this._timeoutId = setTimeout(() => {
                     this._updateToken(key, secret);
                 }, result.body.expires_in * 1000 - 5000);
 
@@ -171,7 +182,6 @@ class ProbitRest extends EventEmitter {
             .catch((error) => {
                 console.log("ProbitRest._updateToken() : " + error.message);
             });
-
     }
 
 }

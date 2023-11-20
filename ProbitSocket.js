@@ -4,12 +4,14 @@ const WebSocket    = require('ws');
 
 class ProbitSocket extends EventEmitter {
 
-    constructor(key, secret, demo = false) {
+    constructor(key = '', secret = '', demo = false) {
         super();
 
         this.server = new WebSocket(!demo ? 'wss://api.probit.com/api/exchange/v1/ws' : 'wss://demo-api.probit.com/api/exchange/v1/ws');
         this.server.on('open', () => {
-            this._authenticate(key, secret);
+            if (key && secret) {
+                this._authenticate(key, secret);
+            }
         });
         this.server.on('message', (data) => {
 
@@ -26,7 +28,7 @@ class ProbitSocket extends EventEmitter {
                     message.data != "{}" && this.emit('balance', message.data);
                     break;
                 }
-            
+
                 case "marketdata": {
 
                     // Ticker.
@@ -130,7 +132,7 @@ class ProbitSocket extends EventEmitter {
                         this.emit('openorder', {
                             id                : Number(order.id),
                             userId            : order.user_id,
-                            marketId          : order.market_id, 							
+                            marketId          : order.market_id,
                             type              : order.type,
                             side              : order.side,
                             quantity          : Number(order.quantity),
@@ -155,7 +157,7 @@ class ProbitSocket extends EventEmitter {
 							//the sea of time floats by while I am blind the whole time.
                             id                : Number(order.id),
                             userId            : order.user_id,
-                            marketId          : order.market_id, 
+                            marketId          : order.market_id,
 							type              : order.type,
                             side              : order.side,
                             quantity          : Number(order.quantity),
@@ -206,6 +208,10 @@ class ProbitSocket extends EventEmitter {
         this.server.send(JSON.stringify({"type":"subscribe","channel":"marketdata","market_id":symbol,"interval":100,"filter":filter}));
     }
 
+    close () {
+        this.server.close();
+    }
+
     _authenticate(key, secret) {
 
         let auth = "Basic " + new Buffer.from(key+":"+secret).toString('base64');
@@ -225,7 +231,7 @@ class ProbitSocket extends EventEmitter {
             .catch((error) => {
                 console.log("Probit._autenticate() : " + error.message);
             });
-       
+
     }
 
 }
