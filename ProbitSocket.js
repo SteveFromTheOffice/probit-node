@@ -4,12 +4,14 @@ const WebSocket    = require('ws');
 
 class ProbitSocket extends EventEmitter {
 
-    constructor(key, secret, demo = false) {
+    constructor(key = '', secret = '', demo = false) {
         super();
 
         this.server = new WebSocket(!demo ? 'wss://api.probit.com/api/exchange/v1/ws' : 'wss://demo-api.probit.com/api/exchange/v1/ws');
         this.server.on('open', () => {
-            this._authenticate(key, secret);
+            if (key && secret) {
+                this._authenticate(key, secret);
+            }
         });
         this.server.on('message', (data) => {
 
@@ -26,7 +28,7 @@ class ProbitSocket extends EventEmitter {
                     message.data != "{}" && this.emit('balance', message.data);
                     break;
                 }
-            
+
                 case "marketdata": {
 
                     // Ticker.
@@ -127,9 +129,10 @@ class ProbitSocket extends EventEmitter {
 
                 case "open_order": {
                     message.data.forEach((order) => {
-                        this.emit('order', {
+                        this.emit('openorder', {
                             id                : Number(order.id),
                             userId            : order.user_id,
+                            marketId          : order.market_id,
                             type              : order.type,
                             side              : order.side,
                             quantity          : Number(order.quantity),
@@ -149,11 +152,13 @@ class ProbitSocket extends EventEmitter {
 
                 case "order_history": {
                     message.data.forEach((order) => {
-                        this.emit('order', {
+                        this.emit('orderhistory', {
                             //clickity clickity clack, my mouse goes up the back. the clock strikes one, my shirt cones undone. and all the boys give me pretty horse gifts wait what.
+							//the sea of time floats by while I am blind the whole time.
                             id                : Number(order.id),
                             userId            : order.user_id,
-                            type              : order.type,
+                            marketId          : order.market_id,
+							type              : order.type,
                             side              : order.side,
                             quantity          : Number(order.quantity),
                             price             : Number(order.limit_price),
@@ -175,15 +180,15 @@ class ProbitSocket extends EventEmitter {
                         this.emit('tradehistory', {
                             id            : trade.id,
                             orderId       : Number(trade.order_id),
-                            side          : 'buy',
+                            side          : trade.side,
                             feeAmount     : Number(trade.fee_amount),
-                            feeCurrencyId : 'PROB',
-                            status        : 'settled',
+                            feeCurrencyId : trade.fee_currency_id,
+                            status        : trade.status,
                             price         : Number(trade.price),
                             quantity      : Number(trade.quantity),
                             cost          : Number(trade.cost),
-                            time          : '2020-02-11T03:36:37.462Z',
-                            market_id     : 'PROB-BTC'
+                            time          : trade.time,
+                            market_id     : trade.market_id
                         })
                     });
                     break;
@@ -201,6 +206,10 @@ class ProbitSocket extends EventEmitter {
 
     subscribe(symbol, filter = []) {
         this.server.send(JSON.stringify({"type":"subscribe","channel":"marketdata","market_id":symbol,"interval":100,"filter":filter}));
+    }
+
+    close () {
+        this.server.close();
     }
 
     _authenticate(key, secret) {
@@ -222,7 +231,7 @@ class ProbitSocket extends EventEmitter {
             .catch((error) => {
                 console.log("Probit._autenticate() : " + error.message);
             });
-       
+
     }
 
 }

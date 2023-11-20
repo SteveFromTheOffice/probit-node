@@ -4,9 +4,9 @@ const ProbitSocket = require("./ProbitSocket.js");
 
 class Probit extends EventEmitter {
 
-    constructor(key, secret, demo = false) {
+    constructor(key = '', secret = '', demo = false) {
         super();
-        
+
         this.socket = new ProbitSocket(key, secret, demo);
             this.socket.on('balance', (balance) => {
                 this.emit('balance', balance);
